@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Reader;
 
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-
 public class PostController {
     public static final String APPLICATION_JSON = "application/json";
     private final PostService service;
@@ -19,52 +17,24 @@ public class PostController {
         this.service = service;
     }
 
-    public void all(HttpServletResponse response) throws IOException {
+    public void all(HttpServletResponse response) throws NotFoundException, IOException {
         response.setContentType(APPLICATION_JSON);
-        try {
-            final var data = service.all();
-            response.getWriter().print(new Gson().toJson(data));
-        } catch (NotFoundException e) {
-            response.setStatus(SC_NOT_FOUND);
-            e.printStackTrace(response.getWriter());
-            e.printStackTrace();
-        }
+        response.getWriter().print(new Gson().toJson(service.all()));
     }
 
-    public void getById(long id, HttpServletResponse response) throws IOException {
+    public void getById(long id, HttpServletResponse response) throws NotFoundException, IOException {
         response.setContentType(APPLICATION_JSON);
-        try {
-            final var entity = service.getById(id);
-            response.getWriter().print(new Gson().toJson(entity));
-        } catch (NotFoundException e) {
-            response.setStatus(SC_NOT_FOUND);
-            e.printStackTrace(response.getWriter());
-            e.printStackTrace();
-        }
+        response.getWriter().print(new Gson().toJson(service.getById(id)));
     }
 
-    public void save(Reader body, HttpServletResponse response) throws IOException {
+    public void save(Reader body, HttpServletResponse response) throws NotFoundException, IOException {
         response.setContentType(APPLICATION_JSON);
         final var gson = new Gson();
-        try {
-            final var post = gson.fromJson(body, Post.class);
-            final var data = service.save(post);
-            response.getWriter().print(gson.toJson(data));
-        } catch (NotFoundException e) {
-            response.setStatus(SC_NOT_FOUND);
-            e.printStackTrace(response.getWriter());
-            e.printStackTrace();
-        }
+        final var data = service.save(gson.fromJson(body, Post.class));
+        response.getWriter().print(gson.toJson(data));
     }
 
-    public void removeById(long id, HttpServletResponse response) throws IOException {
-        response.setContentType(APPLICATION_JSON);
-        try {
-            final var entity = service.removeById(id);
-        } catch (NotFoundException e) {
-            response.setStatus(SC_NOT_FOUND);
-            e.printStackTrace(response.getWriter());
-            e.printStackTrace();
-        }
+    public void removeById(long id, HttpServletResponse response) throws NotFoundException {
+        service.removeById(id);
     }
 }

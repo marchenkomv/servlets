@@ -14,11 +14,7 @@ public class PostService {
     }
 
     public List<Post> all() {
-        final var result = repository.all();
-        if (result.isEmpty()) {
-            throw new NotFoundException("Repository is empty");
-        }
-        return result;
+        return repository.all();
     }
 
     public Post getById(long id) {

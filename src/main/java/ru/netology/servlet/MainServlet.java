@@ -1,12 +1,14 @@
 package ru.netology.servlet;
 
 import ru.netology.controller.PostController;
+import ru.netology.exception.NotFoundException;
 import ru.netology.repository.PostRepository;
 import ru.netology.service.PostService;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class MainServlet extends HttpServlet {
     private final static int ONE_CHARACTER = 1;
@@ -20,7 +22,7 @@ public class MainServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             final var path = req.getRequestURI();
             final var method = req.getMethod();
@@ -44,8 +46,13 @@ public class MainServlet extends HttpServlet {
             }
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (Exception e) {
+            if (e instanceof NotFoundException) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
             e.printStackTrace();
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            e.printStackTrace(resp.getWriter());
         }
     }
 }
